@@ -3,88 +3,256 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Firework Effect</title>
+    <title>Xmas Grand Surprise - Ratheesh</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee+Shade&family=Poppins:wght@800&display=swap" rel="stylesheet">
     <style>
-        /* CSS: സ്ക്രീൻ സെറ്റിംഗ്സ് */
         body {
             margin: 0;
-            padding: 0;
-            background-color: #050505; /* കറുത്ത ബാക്ക്ഗ്രൗണ്ട് */
-            overflow: hidden; /* സ്ക്രോൾ ബാർ ഒഴിവാക്കാൻ */
             height: 100vh;
-            cursor: crosshair;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle, #1a1a2e 0%, #0f0c29 100%);
+            overflow: hidden;
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            color: #fff;
+            position: relative; /* ട്രീയും സ്റ്റാറുകളും സ്ഥാപിക്കാൻ */
         }
 
-        .particle {
+        .watermark {
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 12px;
+            letter-spacing: 1px;
+            z-index: 1000;
+        }
+
+        /* ബട്ടൺ സ്റ്റൈൽ */
+        #surpriseBtn {
+            padding: 18px 45px;
+            font-size: clamp(20px, 4vw, 26px);
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(45deg, #ff0055, #ffdd00);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 25px #ff0055, 0 0 50px #ffdd00;
+            transition: all 0.4s ease-in-out;
+            z-index: 200; /* ഏറ്റവും മുകളിൽ വരാൻ */
+        }
+
+        #surpriseBtn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 50px #ff0055, 0 0 80px #ffdd00, 0 0 120px rgba(255, 255, 0, 0.7);
+        }
+
+        /* ഹാപ്പി എക്സ്മസ് ടെക്സ്റ്റ് */
+        #xmasMessage {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 90%;
+            max-width: 900px;
+            font-family: 'Bungee Shade', cursive;
+            font-size: clamp(2.8rem, 11vw, 7rem); /* കൂടുതൽ വലുപ്പം */
+            color: #fff;
+            text-shadow: 0 0 20px #ff0000, 0 0 40px #ff0000, 0 0 60px #ff0000; /* കൂടുതൽ ഗ്ലോ */
+            z-index: 150;
+            pointer-events: none;
+            line-height: 1.1; /* വരികൾ തമ്മിലുള്ള അകലം */
+        }
+
+        /* ടെക്സ്റ്റ് വരാനുള്ള ആനിമേഷൻ */
+        .show-text {
+            display: block !important;
+            animation: cinematicZoom 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes cinematicZoom {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; filter: blur(20px); }
+            60% { opacity: 1; filter: blur(0); }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; filter: blur(0); }
+        }
+
+        /* ഷെയ്ക്ക് ഇഫക്റ്റ് */
+        .shake { animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both; transform: translate3d(0,0,0); perspective: 1000px; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        /* ക്രിസ്മസ് ട്രീ */
+        .xmas-tree {
+            position: fixed;
+            bottom: -50px; /* സ്ക്രീനിന്റെ അടിയിൽ നിന്ന് വരാൻ */
+            left: 50%;
+            transform: translateX(-50%) scale(0.1);
+            font-size: clamp(8em, 20vw, 15em); /* വലിപ്പം ക്രമീകരിക്കാൻ */
+            opacity: 0;
+            transition: all 1.5s ease-out;
+            z-index: 10;
+            filter: drop-shadow(0 0 10px rgba(0,255,0,0.8));
+        }
+        .xmas-tree.show {
+            opacity: 1;
+            transform: translateX(-50%) scale(0.8); /* വലുതായി വരാൻ */
+            bottom: 0;
+        }
+
+        /* നക്ഷത്രങ്ങൾ */
+        .star {
             position: absolute;
-            border-radius: 50%;
-            pointer-events: none; /* പാർട്ടിക്കിൾസിൽ ക്ലിക്ക് ആകുന്നത് ഒഴിവാക്കാൻ */
-            animation: explode 1s ease-out forwards;
+            color: gold;
+            font-size: clamp(1em, 3vw, 2.5em);
+            opacity: 0;
+            animation: twinkle 3s infinite ease-in-out alternate, fadeIn 1s forwards;
+            z-index: 5;
+            text-shadow: 0 0 5px gold, 0 0 10px gold;
         }
 
-        /* പടക്കം വിരിയുന്ന ആനിമേഷൻ */
-        @keyframes explode {
-            0% {
-                transform: translate(0, 0) scale(1);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(var(--tx), var(--ty)) scale(0);
-                opacity: 0;
-            }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: var(--final-opacity); }
+        }
+
+        /* മഞ്ഞുപൊഴിയുന്ന ഇഫക്റ്റ് */
+        .snowflake {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0;
+            animation: fall linear infinite;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-10vh) translateX(0); opacity: 0; }
+            10% { opacity: 0.8; }
+            100% { transform: translateY(100vh) translateX(var(--drift)); opacity: 0; }
         }
     </style>
 </head>
 <body>
 
+    <div class="watermark">Coding by Ratheesh</div>
+
+    <button id="surpriseBtn">Click to Surprise</button>
+    <h1 id="xmasMessage">HAPPY XMAS</h1>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
     <script>
-        // JavaScript: ക്ലിക്ക് ചെയ്യുമ്പോൾ പാർട്ടിക്കിൾസ് ഉണ്ടാക്കുന്നു
+        const btn = document.getElementById('surpriseBtn');
+        const xmasMessage = document.getElementById('xmasMessage');
+        const treeEmoji = '🎄';
+        const starEmoji = '⭐';
+        const snowflakeEmoji = '❄️';
+
+        btn.addEventListener('click', () => {
+            btn.style.display = 'none';
+            xmasMessage.classList.add('show-text');
+            document.body.classList.add('shake');
+
+            // ക്രിസ്മസ് ട്രീ വരുന്നു
+            const tree = document.createElement('div');
+            tree.classList.add('xmas-tree');
+            tree.textContent = treeEmoji;
+            document.body.appendChild(tree);
+            setTimeout(() => {
+                tree.classList.add('show');
+            }, 500); // ടെക്സ്റ്റ് വന്ന ശേഷം ട്രീ വരുന്നു
+
+            // നക്ഷത്രങ്ങൾ മിന്നുന്നു
+            createStars(20); // 20 നക്ഷത്രങ്ങൾ
+
+            // മഞ്ഞുപൊഴിയുന്നു
+            createSnowflakes(50); // 50 മഞ്ഞുതുള്ളികൾ
+
+            // കൺഫെറ്റി
+            var duration = 5 * 1000;
+            var animationEnd = Date.now() + duration;
+
+            function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) return clearInterval(interval);
+
+                confetti({
+                    particleCount: 50,
+                    startVelocity: 30,
+                    spread: 360,
+                    origin: { x: randomInRange(0.1, 0.9), y: Math.random() - 0.2 },
+                    colors: ['#a8dadc', '#457b9d', '#1d3557', '#e63946', '#f1faee', '#ffd700'] // കൂടുതൽ ക്രിസ്മസ് കളറുകൾ
+                });
+            }, 200);
+
+            // നടുവിലെ വലിയ ബ്ലാസ്റ്റ്
+            confetti({
+                particleCount: 300,
+                spread: 150,
+                origin: { y: 0.6 },
+                colors: ['#e63946', '#f1faee', '#a8dadc', '#457b9d', '#1d3557', '#ffd700']
+            });
+        });
+
+        // ക്ലിക്ക് ചെയ്യുമ്പോൾ പടക്കം
         document.addEventListener('mousedown', (e) => {
-            createFirework(e.clientX, e.clientY);
+            if(btn.style.display === 'none') {
+                confetti({
+                    particleCount: 30,
+                    startVelocity: 30,
+                    spread: 360,
+                    origin: { x: e.clientX / window.innerWidth, y: e.clientY / window.innerHeight },
+                    colors: ['#FFD700', '#FF69B4', '#ADFF2F', '#1E90FF', '#FF4500']
+                });
+            }
         });
 
-        // മൊബൈൽ ടച്ചിന് വേണ്ടി
-        document.addEventListener('touchstart', (e) => {
-            createFirework(e.touches[0].clientX, e.touches[0].clientY);
-        });
+        function createStars(count) {
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                star.textContent = starEmoji;
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 80 + '%'; // മുകളിലെ 80% ഭാഗത്ത് മാത്രം
+                star.style.animationDelay = Math.random() * 2 + 's';
+                star.style.setProperty('--final-opacity', Math.random() * 0.5 + 0.3); // റാൻഡം ഒപാസിറ്റി
+                document.body.appendChild(star);
 
-        function createFirework(x, y) {
-            const particleCount = 30; // എത്ര കഷണങ്ങളായി പൊട്ടണം
-            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#ffffff', '#ffA500'];
+                // കുറച്ച് സമയത്തിന് ശേഷം നക്ഷത്രങ്ങളെ നീക്കം ചെയ്യുക
+                setTimeout(() => star.remove(), 10000 + Math.random() * 5000); // 10-15 സെക്കൻഡ്
+            }
+        }
 
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.classList.add('particle');
+        function createSnowflakes(count) {
+            for (let i = 0; i < count; i++) {
+                const snowflake = document.createElement('div');
+                snowflake.classList.add('snowflake');
+                const size = Math.random() * 5 + 2 + 'px'; // 2px - 7px
+                snowflake.style.width = size;
+                snowflake.style.height = size;
+                snowflake.style.left = Math.random() * 100 + 'vw';
+                snowflake.style.animationDuration = Math.random() * 5 + 5 + 's'; // 5-10s വീഴാൻ
+                snowflake.style.animationDelay = Math.random() * 5 + 's'; // റാൻഡം ഡിലേ
+                snowflake.style.setProperty('--drift', Math.random() * 200 - 100 + 'px'); // വശങ്ങളിലേക്ക് ഒഴുകാൻ
+                document.body.appendChild(snowflake);
 
-                // റാൻഡം നിറം നൽകുന്നു
-                const color = colors[Math.floor(Math.random() * colors.length)];
-                particle.style.backgroundColor = color;
-                particle.style.boxShadow = `0 0 10px ${color}`;
-
-                // വലിപ്പം
-                const size = Math.random() * 6 + 2 + 'px';
-                particle.style.width = size;
-                particle.style.height = size;
-
-                // പൊട്ടിത്തെറിക്കുന്ന ദൂരം കണക്കാക്കുന്നു
-                const angle = Math.random() * Math.PI * 2;
-                const distance = Math.random() * 150 + 50;
-                const tx = Math.cos(angle) * distance + 'px';
-                const ty = Math.sin(angle) * distance + 'px';
-
-                particle.style.setProperty('--tx', tx);
-                particle.style.setProperty('--ty', ty);
-
-                // ക്ലിക്ക് ചെയ്ത സ്ഥലത്ത് പാർട്ടിക്കിൾ വെക്കുന്നു
-                particle.style.left = x + 'px';
-                particle.style.top = y + 'px';
-
-                document.body.appendChild(particle);
-
-                // ആനിമേഷൻ കഴിഞ്ഞാൽ എലമെന്റ് നീക്കം ചെയ്യുന്നു
-                setTimeout(() => {
-                    particle.remove();
-                }, 1000);
+                setTimeout(() => snowflake.remove(), parseFloat(snowflake.style.animationDuration) * 1000 + parseFloat(snowflake.style.animationDelay) * 1000 + 1000);
             }
         }
     </script>
